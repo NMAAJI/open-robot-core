@@ -25,10 +25,14 @@ def is_linux():
 
 
 def detect_model():
-    if not is_linux():
+    try:
+        if not is_linux():
+            return "Unknown"
+        model = run("cat /sys/firmware/devicetree/base/model")
+        cleaned = model.replace("\x00", "").strip()
+        return cleaned if cleaned else "Unknown"
+    except Exception:
         return "Unknown"
-    model = run("cat /sys/firmware/devicetree/base/model")
-    return model if model else "Unknown"
 
 
 def detect_cpu():
@@ -46,8 +50,12 @@ def detect_arch():
 
 def detect_ram():
     if not is_linux():
-        return ""
-    return run("free -h | grep Mem")
+        return 0
+    mem = run("free -g | awk '/Mem:/ {print $2}'")
+    try:
+        return int(mem)
+    except (TypeError, ValueError):
+        return 0
 
 
 def detect_usb():

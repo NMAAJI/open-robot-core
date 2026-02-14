@@ -1,19 +1,22 @@
 def analyze(profile):
     capabilities = {}
 
-    ram = str(profile.get("ram", ""))
-    architecture = str(profile.get("architecture", ""))
+    ram_gb = profile.get("ram", 0)
+    arch = profile.get("architecture", "")
 
-    if "16G" in ram:
+    capabilities["arm_optimized"] = "aarch64" in arch
+
+    if ram_gb >= 8:
         capabilities["vision_enabled"] = True
         capabilities["slam_enabled"] = True
+        capabilities["nav2_enabled"] = True
+    elif ram_gb >= 4:
+        capabilities["vision_enabled"] = False
+        capabilities["slam_enabled"] = True
+        capabilities["nav2_enabled"] = True
     else:
         capabilities["vision_enabled"] = False
         capabilities["slam_enabled"] = False
-
-    if "aarch64" in architecture:
-        capabilities["arm_optimized"] = True
-    else:
-        capabilities["arm_optimized"] = False
+        capabilities["nav2_enabled"] = False
 
     return capabilities
