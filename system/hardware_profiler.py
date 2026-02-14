@@ -26,12 +26,9 @@ def is_linux():
 
 def detect_model():
     try:
-        if not is_linux():
-            return "Unknown"
         model = run("cat /sys/firmware/devicetree/base/model")
-        cleaned = model.replace("\x00", "").strip()
-        return cleaned if cleaned else "Unknown"
-    except Exception:
+        return model.replace("\x00", "").strip()
+    except:
         return "Unknown"
 
 
@@ -49,12 +46,10 @@ def detect_arch():
 
 
 def detect_ram():
-    if not is_linux():
-        return 0
-    mem = run("free -g | awk '/Mem:/ {print $2}'")
     try:
+        mem = run("free -g | awk '/Mem:/ {print $2}'")
         return int(mem)
-    except (TypeError, ValueError):
+    except:
         return 0
 
 
